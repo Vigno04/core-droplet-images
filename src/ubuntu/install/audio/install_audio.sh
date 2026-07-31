@@ -75,12 +75,7 @@ mkdir -p /var/run/pulse
 
 cd $STARTUPDIR
 mkdir jsmpeg
-if [ "$ARCH" = "arm64" ]; then
-    echo "Audio out for arm64 is not currently available. Skipping."
-    touch $STARTUPDIR/jsmpeg/flowcase_audio_out_linux
-else
-    wget -q https://github.com/flowcase/flowcase_audio_out/releases/download/v$VERSION/flowcase_audio_out_linux_$ARCH.tar.gz -O /tmp/flowcase_audio_out_linux.tar.gz
-    tar -xvf /tmp/flowcase_audio_out_linux.tar.gz -C $STARTUPDIR/jsmpeg
-    chmod +x $STARTUPDIR/jsmpeg/flowcase_audio_out_linux
-    rm /tmp/flowcase_audio_out_linux.tar.gz
-fi
+wget -q https://github.com/Vigno04/flowcase_audio_out/releases/download/v$VERSION/flowcase_audio_out_linux_$ARCH.tar.gz -O /tmp/flowcase_audio_out_linux.tar.gz
+tar -xvf /tmp/flowcase_audio_out_linux.tar.gz -C $STARTUPDIR/jsmpeg
+chmod +x $STARTUPDIR/jsmpeg/flowcase_audio_out_linux
+rm /tmp/flowcase_audio_out_linux.tar.gz

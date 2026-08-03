@@ -1,0 +1,15 @@
+# Basic Alpine Core Image based on official Kasm Alpine
+# Note: This is a placeholder basic desktop environment. 
+# It does not include Flowcase-specific custom audio/upload services which require glibc.
+FROM kasmweb/core-alpine-319:1.15.0
+
+USER root
+
+# Add any basic alpine utilities you might want
+RUN apk update && apk add --no-cache \
+    nano \
+    curl \
+    wget
+
+# Switch back to the default Kasm user
+USER 1000

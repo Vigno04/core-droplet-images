@@ -188,6 +188,8 @@ elif [[ "${DISTRO}" == "alpine" ]] ; then
     ln -s /usr/local/share/kasmvnc /usr/share/kasmvnc
     ln -s /usr/local/etc/kasmvnc /etc/kasmvnc
     ln -s /usr/local/lib/kasmvnc /usr/lib/kasmvncserver
+    mkdir -p /usr/local/lib/perl5/site_perl
+    ln -s /usr/local/bin/KasmVNC /usr/local/lib/perl5/site_perl/KasmVNC
 else
     wget "${BUILD_URL}" -O kasmvncserver.deb
     apt-get update

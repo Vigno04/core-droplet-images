@@ -479,6 +479,11 @@ if [ -f $HOME/.bashrc ]; then
     source $HOME/.bashrc
 fi
 
+# Fix permissions for the shared folder (mounted volumes are often root by default)
+if [ -d "$HOME/Shared" ]; then
+    sudo chown -R $(id -u):$(id -g) "$HOME/Shared" || true
+fi
+
 ## resolve_vnc_connection
 VNC_IP=$(hostname -i)
 if [[ $DEBUG == true ]]; then

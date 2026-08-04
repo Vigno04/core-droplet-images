@@ -8,6 +8,16 @@ on:
       - 'dockerfile-*'
       - 'src/**'
   workflow_dispatch:
+    inputs:
+      build_target:
+        description: 'Image to build manually'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - core-alpine
+          - core-ubuntu
 
 jobs:
   detect-changes:
@@ -30,20 +40,37 @@ jobs:
 
       - name: Set up matrix
         id: set-matrix
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          MANUAL_TARGET: ${{ github.event.inputs.build_target }}
         run: |
           DOCKERFILES=()
 
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            if [[ "$file" == dockerfile-* ]]; then
-              DOCKERFILES+=("$file")
-            elif [[ "$file" == src/* ]]; then
-              # If any src file changes, just rebuild all core images to be safe
+          if [[ "$MANUAL_TARGET" == "core-alpine" ]] || [[ "$COMMIT_MESSAGE" == *"[build core-alpine]"* ]]; then
+            echo "Override: building only core-alpine"
+            DOCKERFILES=("dockerfile-core-alpine")
+          elif [[ "$MANUAL_TARGET" == "core-ubuntu" ]] || [[ "$COMMIT_MESSAGE" == *"[build core-ubuntu]"* ]]; then
+            echo "Override: building only core-ubuntu"
+            DOCKERFILES=("dockerfile-core-ubuntu")
+          else
+            if [[ "$MANUAL_TARGET" == "all" ]]; then
               for df in dockerfile-*; do
                 DOCKERFILES+=("$df")
               done
-              break
+            else
+              for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+                if [[ "$file" == dockerfile-* ]]; then
+                  DOCKERFILES+=("$file")
+                elif [[ "$file" == src/* ]]; then
+                  # If any src file changes, just rebuild all core images to be safe
+                  for df in dockerfile-*; do
+                    DOCKERFILES+=("$df")
+                  done
+                  break
+                fi
+              done
             fi
-          done
+          fi
 
           UNIQUE=$(printf '%s\n' "${DOCKERFILES[@]}" | sort -u | tr '\n' ' ')
 

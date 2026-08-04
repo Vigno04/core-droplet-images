@@ -283,8 +283,7 @@ function start_audio_in (){
 function start_upload (){
 	if [[ ${KASM_SVC_UPLOADS:-1} == 1 ]]; then
 		log 'Starting upload server'
-		$STARTUPDIR/upload_server/flowcase_upload_server --ssl --auth-token "flowcase_user:$VNC_PW" --port 4902 --upload_dir ${HOME}/Uploads &
-
+		$STARTUPDIR/upload_server/flowcase_upload_server --ssl --auth-token "flowcase_user:$VNC_PW" --port 4902 --upload_dir ${HOME}/Shared &
 		FLOWCASE_PROCS['upload_server']=$!
 
 		if [[ $DEBUG == true ]]; then

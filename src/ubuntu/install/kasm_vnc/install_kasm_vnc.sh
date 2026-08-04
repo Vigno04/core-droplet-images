@@ -90,27 +90,27 @@ elif [[ "${DISTRO}" = @(debian|parrotos6) ]] ; then
 elif [[ "${DISTRO}" == "alpine" ]] ; then
     if grep -q v3.20 /etc/os-release; then
         if [[ "$(arch)" =~ ^x86_64$ ]] ; then
-            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/output/alpine_320/kasmvnc.alpine_320_x86_64.tgz"
+            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/kasmvnc.alpine_320_x86_64.tgz"
         else
-            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/output/alpine_320/kasmvnc.alpine_320_aarch64.tgz"
+            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/kasmvnc.alpine_320_aarch64.tgz"
         fi
     elif grep -q v3.19 /etc/os-release; then
         if [[ "$(arch)" =~ ^x86_64$ ]] ; then
-            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/output/alpine_319/kasmvnc.alpine_319_x86_64.tgz"
+            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/kasmvnc.alpine_319_x86_64.tgz"
         else
-            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/output/alpine_319/kasmvnc.alpine_319_aarch64.tgz"
+            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/kasmvnc.alpine_319_aarch64.tgz"
         fi
     elif grep -q v3.18 /etc/os-release; then
         if [[ "$(arch)" =~ ^x86_64$ ]] ; then
-            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/output/alpine_318/kasmvnc.alpine_318_x86_64.tgz"
+            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/kasmvnc.alpine_318_x86_64.tgz"
         else
-            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/output/alpine_318/kasmvnc.alpine_318_aarch64.tgz"
+            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/kasmvnc.alpine_318_aarch64.tgz"
         fi
     else
         if [[ "$(arch)" =~ ^x86_64$ ]] ; then
-            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/output/alpine_317/kasmvnc.alpine_317_x86_64.tgz"
+            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/kasmvnc.alpine_317_x86_64.tgz"
         else
-            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/output/alpine_317/kasmvnc.alpine_317_aarch64.tgz"
+            BUILD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${KASMVNC_VER}/kasmvnc.alpine_317_aarch64.tgz"
         fi
     fi
 else
@@ -184,7 +184,7 @@ elif [[ "${DISTRO}" == "alpine" ]] ; then
     if [ "${BUILD_ARCH}" == "x86_64" ]; then
         apk add --no-cache xf86-video-intel
     fi
-    curl -s "${BUILD_URL}" | tar xzvf - -C /
+    curl -sL "${BUILD_URL}" | tar xzvf - -C /
     ln -s /usr/local/share/kasmvnc /usr/share/kasmvnc
     ln -s /usr/local/etc/kasmvnc /etc/kasmvnc
     ln -s /usr/local/lib/kasmvnc /usr/lib/kasmvncserver
@@ -198,5 +198,5 @@ fi
 mkdir -p $KASM_VNC_PATH/www/Downloads
 chown -R 0:0 $KASM_VNC_PATH
 chmod -R og-w $KASM_VNC_PATH
-ln -sf /home/flowcase-user/Downloads $KASM_VNC_PATH/www/Downloads/Downloads
+ln -sf /home/flowcase-user/Shared $KASM_VNC_PATH/www/Downloads/Downloads
 chown -R 1000:0 $KASM_VNC_PATH/www/Downloads

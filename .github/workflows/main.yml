@@ -1,20 +1,85 @@
-name: Build and Push Core Droplets
+name: Build and Push Modified Core Droplets
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'dockerfile-*'
+      - 'src/**'
   workflow_dispatch:
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      dockerfiles: ${{ steps.set-matrix.outputs.dockerfiles }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            dockerfile-*
+            src/**
+
+      - name: Set up matrix
+        id: set-matrix
+        run: |
+          DOCKERFILES=()
+
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            if [[ "$file" == dockerfile-* ]]; then
+              DOCKERFILES+=("$file")
+            elif [[ "$file" == src/* ]]; then
+              # If any src file changes, just rebuild all core images to be safe
+              for df in dockerfile-*; do
+                DOCKERFILES+=("$df")
+              done
+              break
+            fi
+          done
+
+          UNIQUE=$(printf '%s\n' "${DOCKERFILES[@]}" | sort -u | tr '\n' ' ')
+
+          if [ -n "$UNIQUE" ]; then
+            FILES_JSON=$(echo "$UNIQUE" | tr ' ' '\n' | grep -v '^$' | jq -R -s -c 'split("\n") | map(select(length > 0))')
+            echo "dockerfiles=$FILES_JSON" >> $GITHUB_OUTPUT
+          else
+            echo "dockerfiles=[]" >> $GITHUB_OUTPUT
+          fi
+
   build-and-push:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.dockerfiles != '[]' && needs.detect-changes.outputs.dockerfiles != '' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        dockerfile: ${{ fromJson(needs.detect-changes.outputs.dockerfiles) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Extract image name
+        id: extract-name
+        run: |
+          FILENAME="${{ matrix.dockerfile }}"
+          # Map dockerfile-core-ubuntu to core-ubuntu-noble, otherwise use the suffix
+          if [ "$FILENAME" == "dockerfile-core-ubuntu" ]; then
+            IMAGE_NAME="core-ubuntu-noble"
+          else
+            IMAGE_NAME="${FILENAME#dockerfile-}"
+          fi
+          echo "image=$IMAGE_NAME" >> $GITHUB_ENV
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -34,18 +99,10 @@ jobs:
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           echo "OWNER=$OWNER" >> $GITHUB_ENV
 
-      - name: Build and push core-ubuntu-noble
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/${{ env.OWNER }}/core-ubuntu-noble:develop
-          file: ./dockerfile-core-ubuntu
-
-      - name: Build and push core-alpine
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/${{ env.OWNER }}/core-alpine:develop
-          file: ./dockerfile-core-alpine
+          tags: ghcr.io/${{ env.OWNER }}/${{ env.image }}:develop
+          file: ./${{ matrix.dockerfile }}

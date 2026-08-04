@@ -13,37 +13,29 @@ function copy_default_profile_to_home {
 function verify_profile_config {
     echo "Verifying Uploads/Downloads Configurations"
 
-    mkdir -p $HOME/Uploads
-
-    if [ -d "$HOME/Desktop/Uploads" ]; then
-        echo "Uploads Desktop Symlink Exists"
-    else
-        echo "Creating Uploads Desktop Symlink"
-        ln -sf $HOME/Uploads $HOME/Desktop/Uploads
-    fi
-
-
+    mkdir -p $HOME/Shared
     mkdir -p $HOME/Downloads
 
-    if [ -d "$HOME/Desktop/Downloads" ]; then
-        echo "Downloads Desktop Symlink Exists"
+    # Remove old Desktop symlinks if they exist
+    rm -f $HOME/Desktop/Uploads
+    rm -f $HOME/Desktop/Downloads
+
+    if [ -d "$HOME/Desktop/Shared Files" ]; then
+        echo "Shared Files Desktop Symlink Exists"
     else
-        echo "Creating Download Desktop Symlink"
-        ln -sf $HOME/Downloads $HOME/Desktop/Downloads
+        echo "Creating Shared Files Desktop Symlink"
+        ln -sf $HOME/Shared "$HOME/Desktop/Shared Files"
     fi
 
-
-    if [[ "$(readlink -f $KASM_VNC_PATH/www/Downloads/Downloads)" != "$HOME/Downloads" ]]; then
+    if [[ "$(readlink -f $KASM_VNC_PATH/www/Downloads/Downloads)" != "$HOME/Shared" ]]; then
         echo "Fixing Downloads RX Symlink"
         rm -f $KASM_VNC_PATH/www/Downloads/Downloads
-        ln -sf $HOME/Downloads $KASM_VNC_PATH/www/Downloads/Downloads
+        ln -sf $HOME/Shared $KASM_VNC_PATH/www/Downloads/Downloads
     else
         echo "Downloads RX Symlink Exists"
     fi
 
-
     ls -la $HOME/Desktop
-
 }
 
 if  [ -f "$HOME/.bashrc" ]; then

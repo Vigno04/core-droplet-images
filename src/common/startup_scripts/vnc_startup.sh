@@ -598,7 +598,7 @@ do
 					# TODO: Needs work in python project to support auto restart
 					start_printer
 					;;
-				custom_script)
+				custom_startup)
 					echo "The custom startup script exited."
 					# custom startup scripts track the target process on their own, they should not exit
 					custom_startup

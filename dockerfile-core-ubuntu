@@ -110,7 +110,7 @@ RUN mkdir -p $HOME && chown -R 1000:0 $HOME
 RUN apt-get update \
     && apt-get install -y sudo \
     && echo 'flowcase-user ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
-    && rm -rf /var/lib/apt/list/*
+    && rm -rf /var/lib/apt/lists/*
 
 ### FIX PERMISSIONS ## Objective is to change the owner of non-home paths to root, remove write permissions, and set execute where required
 # these files are created on container first exec, by the default user, so we have to create them since default will not have write perm

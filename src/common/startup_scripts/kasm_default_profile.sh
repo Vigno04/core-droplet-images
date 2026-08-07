@@ -15,6 +15,7 @@ function verify_profile_config {
 
     mkdir -p $HOME/Shared
     mkdir -p $HOME/Downloads
+    mkdir -p $HOME/Desktop
 
     # Remove old Desktop symlinks if they exist
     rm -f $HOME/Desktop/Uploads
